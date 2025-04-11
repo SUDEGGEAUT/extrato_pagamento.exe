@@ -1,0 +1,5 @@
+2025-04-11 14:19:56,283 - INFO - Acessando o SIFAMA
+2025-04-11 14:19:57,694 - INFO - ------------------------------------------------
+2025-04-11 14:19:57,695 - INFO - Processando número do processo: 0009937087
+2025-04-11 14:20:00,335 - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
+2025-04-11 14:20:14,998 - WARNING - Connection pool is full, discarding connection: localhost. Connection pool size: 1
