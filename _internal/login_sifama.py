@@ -25,7 +25,7 @@ class SifamaLogin:
         chrome_options.add_argument("--headless")
         service = Service(chromedriver_path)
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        self.driver.get(site_sifama)
+        #self.driver.get(site_sifama)
        
         self.root = tk.Tk()
         self.root.withdraw()
@@ -116,26 +116,25 @@ class SifamaLogin:
             command=lambda: (self.driver.quit(), prompt_window.destroy(), sys.exit()),
             font=("Arial", 10),
             bg="#800000",
-            fg="white"
+            fg="#FFC0CB",
             )
-        close_button.grid(row=1, column=2, columnspan=5, pady=10)
+        close_button.grid(row=1, column=0, pady=10)
 
     def login_window(self):
         # Criação da interface gráfica para entrada de login e senha
         login_window = tk.Toplevel(self.root)
         login_window.title("Login SIFAMA")
-        login_window.configure(bg="white")
         login_window.geometry("250x125")
         login_window.resizable(False, False)
 
         # Labels e campos de entrada de Usuario
-        tk.Label(login_window, text="Usuário:", bg="white", font=("Arial", 10)).grid(row=0, column=0, padx=20, pady=10)
-        login_entry = tk.Entry(login_window)
+        tk.Label(login_window, text="Usuário:", font=("Arial", 10)).grid(row=0, column=0, padx=20, pady=10)
+        login_entry = tk.Entry(login_window, bg="#DCDCDC")
         login_entry.grid(row=0, column=1, padx=5, pady=10)
 
         # Campo de entrada de Senha
-        tk.Label(login_window, text="Senha:", bg="white", font=("Arial", 10)).grid(row=1, column=0, padx=20, pady=10)
-        password_entry = tk.Entry(login_window, show="*")
+        tk.Label(login_window, text="Senha:", font=("Arial", 10)).grid(row=1, column=0, padx=20, pady=10)
+        password_entry = tk.Entry(login_window, bg="#DCDCDC", show="*")
         password_entry.grid(row=1, column=1, padx=5, pady=10)
         password_entry.bind("<Return>", lambda event: login_submit())
 
@@ -155,12 +154,12 @@ class SifamaLogin:
             if overlay_frame is not None:
                 overlay_frame.destroy()  # Remove o frame anterior, se existir
 
-            overlay_frame = tk.Frame(login_window, bg="white")
+            overlay_frame = tk.Frame(login_window)
             overlay_frame.place(relx=0, rely=0, relwidth=1, relheight=1)  # Ocupa toda a janela
             overlay_frame.grid_propagate(False)
 
             # Conteúdo do overlay (spinner e mensagem)
-            spinner_canvas = tk.Canvas(overlay_frame, width=100, height=100, bg="white", highlightthickness=0)
+            spinner_canvas = tk.Canvas(overlay_frame, width=100, height=100, highlightthickness=0)
             spinner_canvas.place(relx=0.5, rely=0.4, anchor="center")  # Centraliza o spinner
             arc = spinner_canvas.create_arc(10, 10, 90, 90, start=0, extent=150, outline="#4682B4", width=5, style="arc")
             animate_spinner()
@@ -172,11 +171,9 @@ class SifamaLogin:
             if hasattr(self, 'spinner_animation'):
                 login_window.after_cancel(self.spinner_animation)
 
-
         def login_submit():
             user = login_entry.get()
             password = password_entry.get()
-
             if user and password:
                 show_spinner()
                 threading.Thread(target=process_login, args=(user, password)).start()
@@ -192,7 +189,13 @@ class SifamaLogin:
             hide_spinner()
 
         # Botão de envio
-        submit_button = tk.Button(login_window, text="Entrar", font=("Arial", 10), command=login_submit)
+        submit_button = tk.Button(
+            login_window,
+            text="Entrar",
+            font=("Arial", 10),
+            bg="#90EE90",
+            fg="#006400",
+            command=login_submit)
         submit_button.grid(row=2, column=1, pady=10)
 
         # Botão para fechar a janela
@@ -202,7 +205,7 @@ class SifamaLogin:
             command=lambda: (self.driver.quit(), sys.exit()),
             font=("Arial", 9),
             bg="#800000",
-            fg="white"
+            fg="#FFC0CB"
             )
         close_button.grid(row=2, column=0, columnspan=1, pady=10)
 
