@@ -15,18 +15,33 @@ import sys
 import logging
 
 class SifamaLogin:
-    def __init__(self, chromedriver_path):
+    def __init__(self, chromedriver_path, chrome_options=None):
         if not os.path.isfile(chromedriver_path):
             logging.error(f"Chromedriver não encontrado: {chromedriver_path}")
             raise FileNotFoundError("Chromedriver não encontrado.")
         
-        site_sifama = r'https://appweb1.antt.gov.br/sca/Site/Login.aspx?ReturnUrl=%2fsar%2fSite'
+        # Configurações do ChromeDriver
+        download_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "download_extrato")
+
+        prefs = {
+            "download.default_directory": download_dir,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True
+        }
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        chrome_options.add_experimental_option("prefs", prefs)
+        chrome_options.add_argument("--headless")  # Modo headless
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--window-size=1920,1080")  # Define a resolução da janela
+
+        # Inicializa o ChromeDriver com logs detalhados
         service = Service(chromedriver_path)
+        service.log_path = "chromedriver.log"
+        service.log_level = "DEBUG"
+
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
-        #self.driver.get(site_sifama)
-       
         self.root = tk.Tk()
         self.root.withdraw()
         
@@ -48,7 +63,7 @@ class SifamaLogin:
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.ID, "ContentPlaceHolderCorpo_LabelBemVindo"))
             )
-            messagebox.showinfo("Sucesso", "Login efetuado com sucesso!")
+            self.root.after(0, lambda: messagebox.showinfo("Sucesso", "Login efetuado com sucesso!"))
             return True
         except TimeoutException:
             # Caso o elemento de sucesso não seja encontrado, verifica a mensagem de erro
@@ -58,7 +73,7 @@ class SifamaLogin:
                 )
                 error_message = error_message_element.text
                 logging.info(f"Mensagem de erro: {error_message}")
-                messagebox.showwarning("Aviso", error_message)
+                self.root.after(0, lambda: messagebox.showwarning("Aviso", error_message))
                 try:
                     ok_button = WebDriverWait(self.driver, 10).until(
                         EC.presence_of_element_located((By.ID, 'MessageBox_ButtonOk'))
@@ -76,7 +91,7 @@ class SifamaLogin:
             return False
         except Exception as e:
             logging.error(f"Erro durante o login: {e}")
-            messagebox.showerror("Erro", "Erro inesperado durante o login.")
+            self.root.after(0, lambda: messagebox.showerror("Erro", "Erro inesperado durante o login."))
             return False
     
     def prompt_window(self):
@@ -113,7 +128,7 @@ class SifamaLogin:
         close_button = tk.Button(
             prompt_window,
             text="Fechar",
-            command=lambda: (self.driver.quit(), prompt_window.destroy(), sys.exit()),
+            command=lambda: (sys.exit()),
             font=("Arial", 10),
             bg="#800000",
             fg="#FFC0CB",
@@ -202,7 +217,7 @@ class SifamaLogin:
         close_button = tk.Button(
             login_window,
             text="Cancelar",
-            command=lambda: (self.driver.quit(), sys.exit()),
+            command=lambda: (sys.exit()),
             font=("Arial", 9),
             bg="#800000",
             fg="#FFC0CB"
